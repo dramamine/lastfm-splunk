@@ -1,0 +1,97 @@
+<dashboard>
+  <label>Is It Metal? By Month</label>
+  <row>
+    <panel>
+      <chart>
+        <title>Track Listens</title>
+        <search>
+          <query><![CDATA[
+index=lastfm sourcetype=lastfm
+| bucket _time span=mon
+| stats count by artist_mbid, _time
+| lookup artist artist_mbid
+| search is_metal=*
+| timechart count by is_metal span=mon
+]]></query>
+        </search>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.chart.style">shiny</option>
+
+      </chart>
+    </panel>
+  </row>
+
+  <row>
+    <panel>
+      <chart>
+        <title>Track Listens</title>
+        <search>
+          <query><![CDATA[
+index=lastfm sourcetype=lastfm
+| bucket _time span=mon
+| stats count by artist_mbid, _time
+| lookup artist artist_mbid
+| search is_metal=*
+| timechart count by is_metal span=mon
+]]></query>
+        </search>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.stackMode">stacked100</option>
+        <option name="charting.chart.style">shiny</option>
+
+      </chart>
+    </panel>
+  </row>
+
+
+  <row>
+    <panel>
+      <chart>
+        <title>Song Duration (in hours)</title>
+        <search>
+          <query><![CDATA[
+index=lastfm sourcetype=lastfm
+| bucket _time span=mon
+| stats sum(duration) AS duration by artist_mbid, _time
+| lookup artist artist_mbid
+| search is_metal=*
+| eval duration=duration/(60*60*1000)
+| timechart sum(duration) by is_metal span=mon
+]]></query>
+        </search>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.chart.style">shiny</option>
+
+      </chart>
+    </panel>
+  </row>
+
+
+
+  <row>
+    <panel>
+      <chart>
+        <title>Song Duration</title>
+        <search>
+          <query><![CDATA[
+index=lastfm sourcetype=lastfm
+| bucket _time span=mon
+| stats sum(duration) AS duration by artist_mbid, _time
+| lookup artist artist_mbid
+| search is_metal=*
+| timechart sum(duration) by is_metal span=mon
+]]></query>
+        </search>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.stackMode">stacked100</option>
+        <option name="charting.chart.style">shiny</option>
+
+      </chart>
+    </panel>
+  </row>
+
+
+
+</dashboard>

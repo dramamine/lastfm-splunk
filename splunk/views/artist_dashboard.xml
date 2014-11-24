@@ -1,0 +1,122 @@
+<form autoRun="true">
+  <label>Artist Dashboard</label>
+  <fieldset>
+    <input type="text" token="artist">
+      <label>Artist name</label>
+      <default>Tool</default>
+    </input>
+  </fieldset>
+  <row>
+    <html>
+      <img src="http://userserve-ak.last.fm/serve/_/5451503/Tool+T00L.jpg" />
+    </html>
+  </row>
+  <row>
+    <panel>
+    <title>Song Listens Over All Time</title>
+      <chart>
+        <searchTemplate><![CDATA[
+index=lastfm sourcetype=lastfm artist_name=$artist$
+| bucket _time span=mon
+| timechart count
+]]>
+        </searchTemplate>
+        <option name="charting.chart">column</option>
+      </chart>
+    </panel>
+
+    <panel>
+    <title>Song Listens By Duration</title>
+      <chart>
+        <searchTemplate><![CDATA[
+index=lastfm sourcetype=lastfm artist_name=$artist$
+| bucket _time span=mon
+| eval duration=(duration/60000)/60
+| timechart sum(duration) AS "Hours"
+]]>
+        </searchTemplate>
+        <option name="charting.chart">column</option>
+      </chart>
+    </panel>
+
+  </row>
+
+  <row>
+    <panel>
+    <title>Top Songs By Playcount</title>
+      <table>
+        <searchTemplate><![CDATA[
+index=lastfm sourcetype=lastfm artist_name=Tool
+| stats count AS listens, first(duration) AS "length" BY track_name
+| eval length=length/1000
+| eval mins = floor(length/60)
+| eval secs = length-mins*60
+| eval secs = case(len(secs)==2, "00", len(secs)==1, "0" + secs, 1==1, secs )
+| eval length = mins + ":" + secs
+| table track_name, listens, length
+| sort -listens
+| rename track_name AS "Track Name", length AS "Length", listens AS "Listens"
+]]>
+        </searchTemplate>
+      </table>
+    </panel>
+
+    <panel>
+    <title>Top Songs By Duration</title>
+      <table>
+        <searchTemplate><![CDATA[
+index=lastfm sourcetype=lastfm artist_name=Tool
+| stats sum(duration) AS hours, first(duration) AS "length" BY track_name
+| eval hours=hours/(60*60*1000)
+| eval length=length/1000
+| eval mins = floor(length/60)
+| eval secs = length-mins*60
+| eval secs = case(len(secs)==2, "00", len(secs)==1, "0" + secs, 1==1, secs )
+| eval length = mins + ":" + secs
+| table track_name, hours, length
+| sort -hours
+| rename track_name AS "Track Name", length AS "Length", hours AS "Hours"
+]]>
+        </searchTemplate>
+      </table>
+    </panel>
+
+  </row>
+
+
+  <row>
+    <panel>
+    <title>Top "Previous Artists"</title>
+      <table>
+        <searchTemplate><![CDATA[
+index=lastfm sourcetype=lastfm
+| streamstats first(artist_name) AS prev_artist window=2
+| search artist_name="Tool"
+| where artist_name != prev_artist
+| stats count by prev_artist
+| sort -count
+]]>
+        </searchTemplate>
+      </table>
+    </panel>
+
+    <panel>
+    <title>Top "Next Artists"</title>
+      <table>
+        <searchTemplate><![CDATA[
+index=lastfm sourcetype=lastfm
+| streamstats first(artist_name) AS prev_artist window=2
+| search prev_artist="Tool"
+| where artist_name != prev_artist
+| stats count by artist_name
+| sort -count
+]]>
+        </searchTemplate>
+      </table>
+    </panel>
+
+  </row>
+
+
+
+</form>

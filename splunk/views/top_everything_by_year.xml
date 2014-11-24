@@ -1,0 +1,49 @@
+<form script="img_renderer.js" autoRun="true">
+  <label>Top By Year (Artist Images)</label>
+  <fieldset>
+    <input type="dropdown" token="year">
+      <default>2014</default>
+      <label>Year</label>
+      <populatingSearch fieldForValue="yr" fieldForLabel="yr">
+        <![CDATA[
+index=lastfm sourcetype=lastfm
+| eval yr = substr(_raw,1,4)
+| dedup yr
+| table yr
+      ]]>
+      </populatingSearch>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <table id="table1">
+        <title>Top Artists By Listens</title>
+        <search>
+          <query>
+            <![CDATA[
+index=main sourcetype=lastfm earliest=01/01/$year$:00:00:00 latest=12/31/$year$:23:59:59
+| eval url="http://userserve-ak.last.fm/serve/126/75527962.jpg"
+| stats count by artist_name, url
+| sort -count
+]]>
+          </query>
+        </search>
+      </table>
+    </panel>
+    <panel>
+      <table>
+        <title>Top Artists By Duration (in Hours)</title>
+        <search>
+          <query>
+            <![CDATA[
+index=main sourcetype=lastfm earliest=01/01/$year$:00:00:00 latest=12/31/$year$:23:59:59
+| eval duration=duration/(60*60*1000)
+| stats sum(duration) AS duration by artist_name
+| sort -duration
+]]>
+          </query>
+        </search>
+      </table>
+    </panel>
+  </row>
+</form>

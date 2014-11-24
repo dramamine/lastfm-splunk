@@ -1,0 +1,6 @@
+node_modules/
+public/javascripts/amcharts/
+bower_components/
+README-private.md
+config/config.rb
+scripts/api-to-db/Gemfile.lock
